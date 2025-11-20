@@ -161,15 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // ▼▼ ここから修正 ▼▼
     const scoreValue = document.getElementById('scoreInput').value;
 
-    // スコアが0以下、または入力されていない場合（required属性があるため基本ないが念のため）
     if (!scoreValue || scoreValue <= 0) {
       setStatus("スコアは1以上の数値を入力してください。", true);
-      return; // 送信を中止
+      return;
     }
-    // ▲▲ ここまで修正 ▲▲
 
     submitButton.disabled = true;
     submitButton.textContent = '送信中...';
@@ -181,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
       difficulty: document.getElementById('difficultySelect').value,
       tid: tidNormalized,
       name: nameValue,
-      score: scoreValue, // 修正した scoreValue を使用
+      score: scoreValue,
       comment: document.getElementById('commentInput').value
     };
 
@@ -366,4 +363,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRankings();
 
 });
+
 
