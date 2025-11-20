@@ -18,7 +18,7 @@ const settingsDatabase = {
   },
   "SDVX": {
     songs: [
-      "未定 TODO:書く",
+      "量子の海のリントヴルム",
       "Übertreffen"
     ],
     difficulties: [
@@ -363,5 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRankings();
 
 });
+
 
 
