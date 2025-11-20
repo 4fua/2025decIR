@@ -55,8 +55,8 @@ const settingsDatabase = {
   },
   "オンゲキ": {
     songs: [
-      "未定1",
-      "未定2"
+      "まっすぐ→→→ストリーム！",
+      "Climax"
     ],
     difficulties: [
       "BAS",
@@ -364,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRankings();
 
 });
+
 
 
 
