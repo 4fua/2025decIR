@@ -10,6 +10,7 @@ const settingsDatabase = {
       "B4U(BEMANI FOR YOU MIX)"
     ],
     difficulties: [
+      "BEGINNER",
       "NORMAL",
       "HYPER",
       "ANOTHER",
@@ -363,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRankings();
 
 });
+
 
 
 
