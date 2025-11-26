@@ -77,6 +77,42 @@ const settingsDatabase = {
       "おに",
       "おに(裏)"
     ]
+  },
+  "ARCAEA": {
+    songs: [
+      "Crimson Throne",
+      "Vulcanus"
+    ],
+    difficulties: [
+      "PST",
+      "PRS",
+      "FTR"
+    ]
+  },
+  "プロセカ": {
+    songs: [
+      "マトリョシカ",
+      "Brand New Day"
+    ],
+    difficulties: [
+      "EASY",
+      "NORMAL",
+      "HARD",
+      "EXPERT",
+      "MASTER",
+      "APPEND"
+    ]
+  },
+  "Phigros": {
+    songs: [
+      "インフェルノシティ",
+      "Ad astra per astera"
+    ],
+    difficulties: [
+      "EZ",
+      "HD",
+      "IN"
+    ]
   }
 };
 
