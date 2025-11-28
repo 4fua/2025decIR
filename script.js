@@ -268,7 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return acc;
     }, {});
 
-    for (const gameName of Object.keys(groupedByGame).sort()) {
+    // settingsDatabaseのキー順（記述順）でループ
+    Object.keys(settingsDatabase).forEach(gameName => {
+      if (!groupedByGame[gameName]) return;
+
       const gameSection = document.createElement('div');
       gameSection.className = 'game-ranking';
       
@@ -286,7 +289,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return acc;
       }, {});
 
-      for (const songName of Object.keys(groupedBySong).sort()) {
+      // settingsDatabase内のsongs配列の順序でループ
+      const definedSongs = settingsDatabase[gameName].songs;
+      definedSongs.forEach(songName => {
+        if (!groupedBySong[songName]) return;
+
         const songSection = document.createElement('div');
         songSection.className = 'song-ranking';
         
@@ -304,7 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
           return acc;
         }, {});
 
-        for (const difficultyName of Object.keys(groupedByDifficulty).sort()) {
+        // settingsDatabase内のdifficulties配列の順序でループ
+        const definedDifficulties = settingsDatabase[gameName].difficulties;
+        definedDifficulties.forEach(difficultyName => {
+          if (!groupedByDifficulty[difficultyName]) return;
+
           const difficultySection = document.createElement('div');
           difficultySection.className = 'difficulty-ranking';
           
@@ -360,11 +371,13 @@ document.addEventListener('DOMContentLoaded', () => {
           
           difficultySection.appendChild(list);
           songSection.appendChild(difficultySection);
-        }
+        });
+        
         gameSection.appendChild(songSection);
-      }
+      });
+      
       rankingContainer.appendChild(gameSection);
-    }
+    });
   }
 
   function loadRankings() {
@@ -400,8 +413,3 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRankings();
 
 });
-
-
-
-
-
