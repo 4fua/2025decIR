@@ -1,13 +1,14 @@
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxfEUWltEifjCZKrBXUMM-oY7JLfT3LFqDPTAss3Ls2ptN1JzEMoZ2cz0weRohhghm54Q/exec';
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwWCZXoUxNFYJquX1SMtzaPpLTkPCzv8t2s1CDW9sLakcyOYdVIwqLRwjRXXNd9wg7tAw/exec';
 
-const IS_RANKING_PUBLIC = false;
-const IS_SUBMISSION_OPEN = false;
+const IS_RANKING_PUBLIC = true;
+const IS_SUBMISSION_OPEN = true;
 
 const settingsDatabase = {
   "IIDX": {
     songs: [
-      "AA",
-      "B4U(BEMANI FOR YOU MIX)"
+      "BENiZAKURA",
+      "九十九ノ恋結ビ",
+      "月下散刄"
     ],
     difficulties: [
       "BEGINNER",
@@ -15,104 +16,65 @@ const settingsDatabase = {
       "HYPER",
       "ANOTHER",
       "LEGGENDARIA"
-    ]
+    ],
   },
   "SDVX": {
     songs: [
-      "量子の海のリントヴルム",
-      "Übertreffen"
+      "It's All Right",
+      "いますぐ輪廻",
+      "モノノケ狂想曲"
     ],
     difficulties: [
       "NOV",
       "ADV",
       "EXH",
-      "MXM相当"
-    ]
+      "MXM"
+    ],
+    description: "提出する値：通常スコア"
   },
   "CHUNITHM": {
     songs: [
-      "volcanic",
-      "雪男"
+      "inkar-usi",
+      "ERIS -Legend of Gaidelia-",
+      "Nijirate Fanatics"
     ],
     difficulties: [
-      "BAS",
-      "ADV",
-      "EXP",
-      "MAS"
-    ]
-  },
-  "maimai": {
-    songs: [
-      "トランスダンスアナーキー",
-      "Energizing Flame"
+      "BASIC",
+      "ADVANCED",
+      "EXPERT",
+      "MASTER"
     ],
-    difficulties: [
-      "BAS",
-      "ADV",
-      "EXP",
-      "MAS"
-    ]
+    description: "提出する値：通常スコア"
   },
   "オンゲキ": {
     songs: [
-      "まっすぐ→→→ストリーム！",
-      "Climax"
+      "Λlteration",
+      "ラグトレイン",
+      "セガサターン起動音[H.][Remix]"
     ],
     difficulties: [
-      "BAS",
-      "ADV",
-      "EXP",
-      "MAS"
-    ]
-  },
-  "太鼓の達人": {
-    songs: [
-      "Black Rose Apostle",
-      "〆ドレー2000"
-    ],
-    difficulties: [
-      "かんたん",
-      "ふつう",
-      "むずかしい",
-      "おに",
-      "おに(裏)"
-    ]
-  },
-  "ARCAEA": {
-    songs: [
-      "Crimson Throne",
-      "Vulcanus"
-    ],
-    difficulties: [
-      "PST",
-      "PRS",
-      "FTR"
-    ]
-  },
-  "プロセカ": {
-    songs: [
-      "マトリョシカ",
-      "Brand New Day"
-    ],
-    difficulties: [
-      "EASY",
-      "NORMAL",
-      "HARD",
+      "BASIC",
+      "ADVANCED",
       "EXPERT",
       "MASTER",
-      "APPEND"
-    ]
+      "LUNATIC"
+    ],
+    description: "提出する値：テクニカルスコア"
   },
-  "Phigros": {
+  "maimai でらっくす": {
     songs: [
-      "インフェルノシティ",
-      "Ad astra per astera"
+      "悪戯 (ST)",
+      "STEREOSCAPE (DX)",
+      "HANIPAGANDA (DX)"
     ],
     difficulties: [
-      "EZ",
-      "HD",
-      "IN"
-    ]
+      "BASIC",
+      "ADVANCED",
+      "EXPERT",
+      "MASTER",
+      "Re:MASTER"
+    ],
+    description: "提出する値：通常スコア[%]×10000"
   }
 };
 
@@ -124,6 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusMessage = document.getElementById('statusMessage');
   const submitButton = document.getElementById('submitButton');
   const rankingContainer = document.getElementById('rankingContainer');
+  const gameDescription = document.getElementById('gameDescription');
+  
+  const tidInput = document.getElementById('tidInput');
+  const nameInput = document.getElementById('nameInput');
+
+  // 【追加】ページ読み込み時に保存された値をセット
+  if (localStorage.getItem('savedTid')) tidInput.value = localStorage.getItem('savedTid');
+  if (localStorage.getItem('savedName')) nameInput.value = localStorage.getItem('savedName');
 
   function setStatus(message, isError = false) {
     statusMessage.textContent = message;
@@ -138,6 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (selectedGame && settingsDatabase[selectedGame]) {
       const settings = settingsDatabase[selectedGame];
+
+      if (settings.description) {
+        gameDescription.textContent = settings.description;
+        gameDescription.style.display = 'block';
+      } else {
+        gameDescription.style.display = 'none';
+      }
       
       songSelect.disabled = false;
       const placeholderSong = document.createElement('option');
@@ -177,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
       placeholderDiff.value = "";
       placeholderDiff.textContent = "-- まず機種を選んでください --";
       difficultySelect.appendChild(placeholderDiff);
+      gameDescription.style.display = 'none';
     }
   });
 
@@ -188,22 +166,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const tidValue = document.getElementById('tidInput').value.trim();
-    const nameValue = document.getElementById('nameInput').value.trim();
-    
-    const tidNormalized = tidValue.toLowerCase();
+    const tidValue = tidInput.value.trim();
+    const nameValue = nameInput.value.trim();
 
-    if (!tidNormalized || !nameValue) {
-      setStatus("IDと名前は両方必須です（空白のみは不可）。", true);
+    if (!tidValue || !nameValue) {
+      setStatus("X IDと名前は両方必須です（空白のみは不可）。", true);
       return;
     }
 
-    const scoreValue = document.getElementById('scoreInput').value;
-
-    if (!scoreValue || scoreValue <= 0) {
-      setStatus("スコアは1以上の数値を入力してください。", true);
-      return;
-    }
+    // 【追加】送信時にlocalStorageに保存
+    localStorage.setItem('savedTid', tidValue);
+    localStorage.setItem('savedName', nameValue);
 
     submitButton.disabled = true;
     submitButton.textContent = '送信中...';
@@ -213,9 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
       game: document.getElementById('gameSelect').value,
       song: document.getElementById('songSelect').value,
       difficulty: document.getElementById('difficultySelect').value,
-      tid: tidNormalized,
+      tid: tidValue,
       name: nameValue,
-      score: scoreValue,
+      score: document.getElementById('scoreInput').value,
       comment: document.getElementById('commentInput').value
     };
 
@@ -229,10 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(response => {
       setStatus('スコアを送信しました！最新のランキングを読み込みます...', false);
+      form.reset(); 
       
-      document.getElementById('gameSelect').value = "";
-      document.getElementById('scoreInput').value = "";
-      document.getElementById('commentInput').value = "";
+      // 【修正】フォームリセット後、保存されたIDと名前を再セット
+      tidInput.value = localStorage.getItem('savedTid') || '';
+      nameInput.value = localStorage.getItem('savedName') || '';
 
       songSelect.innerHTML = '<option value="">-- まず機種を選んでください --</option>';
       songSelect.disabled = true;
@@ -268,10 +242,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return acc;
     }, {});
 
-    // settingsDatabaseのキー順（記述順）でループ
-    Object.keys(settingsDatabase).forEach(gameName => {
-      if (!groupedByGame[gameName]) return;
+    const gameOrder = Object.keys(settingsDatabase);
+    const sortedGames = Object.keys(groupedByGame).sort((a, b) => {
+      const indexA = gameOrder.indexOf(a) === -1 ? 999 : gameOrder.indexOf(a);
+      const indexB = gameOrder.indexOf(b) === -1 ? 999 : gameOrder.indexOf(b);
+      return indexA - indexB;
+    });
 
+    for (const gameName of sortedGames) {
       const gameSection = document.createElement('div');
       gameSection.className = 'game-ranking';
       
@@ -289,11 +267,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return acc;
       }, {});
 
-      // settingsDatabase内のsongs配列の順序でループ
-      const definedSongs = settingsDatabase[gameName].songs;
-      definedSongs.forEach(songName => {
-        if (!groupedBySong[songName]) return;
+      const songOrder = settingsDatabase[gameName] ? settingsDatabase[gameName].songs : [];
+      const sortedSongs = Object.keys(groupedBySong).sort((a, b) => {
+        const indexA = songOrder.indexOf(a) === -1 ? 999 : songOrder.indexOf(a);
+        const indexB = songOrder.indexOf(b) === -1 ? 999 : songOrder.indexOf(b);
+        return indexA - indexB;
+      });
 
+      for (const songName of sortedSongs) {
         const songSection = document.createElement('div');
         songSection.className = 'song-ranking';
         
@@ -311,11 +292,14 @@ document.addEventListener('DOMContentLoaded', () => {
           return acc;
         }, {});
 
-        // settingsDatabase内のdifficulties配列の順序でループ
-        const definedDifficulties = settingsDatabase[gameName].difficulties;
-        definedDifficulties.forEach(difficultyName => {
-          if (!groupedByDifficulty[difficultyName]) return;
+        const diffOrder = settingsDatabase[gameName] ? settingsDatabase[gameName].difficulties : [];
+        const sortedDifficulties = Object.keys(groupedByDifficulty).sort((a, b) => {
+          const indexA = diffOrder.indexOf(a) === -1 ? 999 : diffOrder.indexOf(a);
+          const indexB = diffOrder.indexOf(b) === -1 ? 999 : diffOrder.indexOf(b);
+          return indexA - indexB;
+        });
 
+        for (const difficultyName of sortedDifficulties) {
           const difficultySection = document.createElement('div');
           difficultySection.className = 'difficulty-ranking';
           
@@ -327,17 +311,15 @@ document.addEventListener('DOMContentLoaded', () => {
           
           for (const record of groupedByDifficulty[difficultyName]) {
             if (!record.tid || !record.name || record.score === null || record.score === undefined) continue;
-            
-            const tidNormalized = record.tid.toLowerCase();
-            
-            if (!highestScores.has(tidNormalized) || Number(record.score) > Number(highestScores.get(tidNormalized).score)) {
-              highestScores.set(tidNormalized, record);
+            const tid = record.tid;
+            if (!highestScores.has(tid) || record.score > highestScores.get(tid).score) {
+              highestScores.set(tid, record);
             }
           }
           
           const filteredRecords = Array.from(highestScores.values());
           
-          const sortedRecords = filteredRecords.sort((a, b) => Number(b.score) - Number(a.score));
+          const sortedRecords = filteredRecords.sort((a, b) => b.score - a.score);
 
           const list = document.createElement('ol');
           sortedRecords.forEach((record, index) => {
@@ -371,17 +353,14 @@ document.addEventListener('DOMContentLoaded', () => {
           
           difficultySection.appendChild(list);
           songSection.appendChild(difficultySection);
-        });
-        
+        }
         gameSection.appendChild(songSection);
-      });
-      
+      }
       rankingContainer.appendChild(gameSection);
-    });
+    }
   }
 
   function loadRankings() {
-    
     if (!IS_RANKING_PUBLIC) {
       rankingContainer.innerHTML = '<p>ランキング公開を停止しました！結果発表日をお待ちください。</p>';
       rankingContainer.style.color = '#333'; 
@@ -410,8 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
+  gameDescription.style.display = 'none';
   loadRankings();
-
 });
-
-
